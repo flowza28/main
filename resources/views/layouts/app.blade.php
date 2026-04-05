@@ -60,6 +60,13 @@
                         <i class="fas fa-box me-1"></i>Packages
                     </a>
                 </li>
+                @if(auth()->user()->role === 'admin')
+                    <li class="nav-item">
+                        <a class="nav-link px-3 {{ request()->routeIs('pool-groups.*') ? 'active fw-bold' : '' }}" href="{{ route('pool-groups.index') }}">
+                            <i class="fas fa-layer-group me-1"></i>Pool Groups
+                        </a>
+                    </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('invoices.*') ? 'active fw-bold' : '' }}" href="{{ route('invoices.index') }}">
                         <i class="fas fa-file-invoice-dollar me-1"></i>Invoices

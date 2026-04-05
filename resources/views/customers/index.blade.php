@@ -56,6 +56,7 @@
                         <tr>
                             <th class="border-0 ps-4">Customer</th>
                             <th class="border-0">Package</th>
+                            <th class="border-0">Pool Group</th>
                             <th class="border-0">Expired Date</th>
                             <th class="border-0">Status</th>
                             <th class="border-0 text-center">Actions</th>
@@ -79,6 +80,15 @@
                                     @if($customer->package)
                                         <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
                                             {{ $customer->package->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($customer->poolGroup)
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
+                                            {{ $customer->poolGroup->name }}
                                         </span>
                                     @else
                                         <span class="text-muted">-</span>
@@ -111,14 +121,6 @@
                                         <a href="{{ route('customers.edit', $customer) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('customers.toggleStatus', $customer) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm {{ $customer->active ? 'btn-outline-warning' : 'btn-outline-success' }}"
-                                                    title="{{ $customer->active ? 'Deactivate' : 'Activate' }}"
-                                                    onclick="return confirm('{{ $customer->active ? 'Nonaktifkan' : 'Aktifkan' }} customer ini?')">
-                                                <i class="fas fa-{{ $customer->active ? 'pause' : 'play' }}"></i>
-                                            </button>
-                                        </form>
                                         <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')

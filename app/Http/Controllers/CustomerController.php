@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Package;
+use App\Models\PoolGroup;
 use App\Services\FreeRadiusService;
 use Illuminate\Http\Request;
 
@@ -32,7 +33,9 @@ class CustomerController extends Controller
     public function create()
     {
         $packages = Package::all();
-        return view('customers.create', compact('packages'));
+        $poolGroups = PoolGroup::all();
+
+        return view('customers.create', compact('packages', 'poolGroups'));
     }
 
     public function store(Request $request)
@@ -42,6 +45,7 @@ class CustomerController extends Controller
             'username' => 'required|string|max:100|unique:customers,username',
             'password' => 'required|string|min:6',
             'package_id' => 'required|exists:packages,id',
+            'pool_group_id' => 'nullable|exists:pool_groups,id',
             'expired_at' => 'nullable|date',
             'active' => 'boolean',
             'email' => 'nullable|email',
@@ -61,7 +65,9 @@ class CustomerController extends Controller
     public function edit(Customer $customer)
     {
         $packages = Package::all();
-        return view('customers.edit', compact('customer', 'packages'));
+        $poolGroups = PoolGroup::all();
+
+        return view('customers.edit', compact('customer', 'packages', 'poolGroups'));
     }
 
     public function update(Request $request, Customer $customer)
@@ -71,6 +77,7 @@ class CustomerController extends Controller
             'username' => 'required|string|max:100|unique:customers,username,' . $customer->id,
             'password' => 'nullable|string|min:6',
             'package_id' => 'required|exists:packages,id',
+            'pool_group_id' => 'nullable|exists:pool_groups,id',
             'expired_at' => 'nullable|date',
             'active' => 'boolean',
             'email' => 'nullable|email',
@@ -78,11 +85,19 @@ class CustomerController extends Controller
             'address' => 'nullable|string',
         ]);
 
+        $customer->name = $data['name'];
+        $customer->username = $data['username'];
+        $customer->package_id = $data['package_id'];
+        $customer->pool_group_id = $data['pool_group_id'] ?? null;
+        $customer->expired_at = $data['expired_at'];
+        $customer->email = $data['email'];
+        $customer->phone = $data['phone'];
+        $customer->address = $data['address'];
+
         if ($data['password']) {
             $customer->password = $data['password'];
         }
 
-        $customer->fill(array_filter($data, fn ($value) => ! is_null($value) && $value !== ''));
         $customer->active = $request->boolean('active');
         $customer->status = $customer->active ? 'active' : 'nonaktif';
         $customer->save();
@@ -100,23 +115,4 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')->with('success', 'Customer ISP berhasil dihapus.');
     }
 
-    public function toggleStatus(Customer $customer)
-    {
-        if ($customer->active) {
-            // Nonaktifkan: set expired_at ke kemarin
-            $customer->expired_at = now()->subDay();
-            $customer->status = 'nonaktif';
-        } else {
-            // Aktifkan: remove expired_at
-            $customer->expired_at = null;
-            $customer->status = 'active';
-        }
-
-        $customer->active = ! $customer->active;
-        $customer->save();
-
-        $this->freeRadius->syncCustomer($customer);
-
-        return redirect()->route('customers.index')->with('success', 'Status customer berhasil diubah.');
-    }
 }

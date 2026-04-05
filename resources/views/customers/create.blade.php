@@ -29,6 +29,15 @@
                     </select>
                 </div>
                 <div class="col-md-6">
+                    <label class="form-label">Pool Group</label>
+                    <select name="pool_group_id" class="form-select">
+                        <option value="">Pilih pool group (opsional)</option>
+                        @foreach($poolGroups as $poolGroup)
+                            <option value="{{ $poolGroup->id }}">{{ $poolGroup->name }} ({{ $poolGroup->start_ip }} - {{ $poolGroup->end_ip }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-6">
                     <label class="form-label">Expired Date</label>
                     <input type="date" name="expired_at" class="form-control" value="{{ old('expired_at') }}">
                 </div>

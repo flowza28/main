@@ -52,6 +52,25 @@ class FreeRadiusService
             $this->removeExpiration($customer);
         }
 
+        // Pool group assignment
+        if ($customer->poolGroup) {
+            $this->connection->table('radreply')->updateOrInsert(
+                [
+                    'username' => $customer->username,
+                    'attribute' => 'Mikrotik-Group',
+                ],
+                [
+                    'op' => ':=',
+                    'value' => $customer->poolGroup->name,
+                ]
+            );
+        } else {
+            $this->connection->table('radreply')
+                ->where('username', $customer->username)
+                ->where('attribute', 'Mikrotik-Group')
+                ->delete();
+        }
+
         // Pastikan user tidak di-block Auth-Type
         $this->connection->table('radcheck')
             ->where('username', $customer->username)
