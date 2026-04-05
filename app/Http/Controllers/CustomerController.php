@@ -49,7 +49,6 @@ class CustomerController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        $data['password'] = $data['password'];
         $data['active'] = $request->boolean('active');
         $data['status'] = $data['active'] ? 'active' : 'nonaktif';
 
@@ -103,15 +102,20 @@ class CustomerController extends Controller
 
     public function toggleStatus(Customer $customer)
     {
+        if ($customer->active) {
+            // Nonaktifkan: set expired_at ke kemarin
+            $customer->expired_at = now()->subDay();
+            $customer->status = 'nonaktif';
+        } else {
+            // Aktifkan: remove expired_at
+            $customer->expired_at = null;
+            $customer->status = 'active';
+        }
+
         $customer->active = ! $customer->active;
-        $customer->status = $customer->active ? 'active' : 'nonaktif';
         $customer->save();
 
-        if ($customer->active) {
-            $this->freeRadius->enableCustomer($customer);
-        } else {
-            $this->freeRadius->disableCustomer($customer);
-        }
+        $this->freeRadius->syncCustomer($customer);
 
         return redirect()->route('customers.index')->with('success', 'Status customer berhasil diubah.');
     }

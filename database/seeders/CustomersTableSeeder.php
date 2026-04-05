@@ -29,5 +29,19 @@ class CustomersTableSeeder extends Seeder
             'phone' => '081234567890',
             'address' => 'Jl. Contoh No. 1',
         ]);
+
+        Customer::updateOrCreate([
+            'username' => 'pelanggan2',
+        ], [
+            'name' => 'Pelanggan 2 (Expired)',
+            'password' => 'secret123',
+            'package_id' => $package->id,
+            'expired_at' => now()->subDay(), // Sudah expired
+            'active' => true,
+            'status' => 'active',
+            'email' => 'pelanggan2@example.com',
+            'phone' => '081234567891',
+            'address' => 'Jl. Contoh No. 2',
+        ]);
     }
 }

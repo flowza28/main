@@ -38,7 +38,15 @@
                     <td>{{ $customer->name }}</td>
                     <td>{{ $customer->package->name ?? '-' }}</td>
                     <td>{{ optional($customer->expired_at)->format('Y-m-d') }}</td>
-                    <td>{{ $customer->status }}</td>
+                    <td>
+                        @if($customer->isExpired())
+                            <span class="badge bg-danger">Expired</span>
+                        @elseif($customer->status === 'active')
+                            <span class="badge bg-success">Active</span>
+                        @else
+                            <span class="badge bg-secondary">Inactive</span>
+                        @endif
+                    </td>
                     <td>
                         <a href="{{ route('customers.edit', $customer) }}" class="btn btn-sm btn-warning">Edit</a>
                         <form action="{{ route('customers.toggleStatus', $customer) }}" method="POST" class="d-inline">

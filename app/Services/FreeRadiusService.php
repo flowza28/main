@@ -29,25 +29,32 @@ class FreeRadiusService
             ['op' => ':=', 'value' => $package->rate_limit, 'updated_at' => now(), 'created_at' => now()]
         );
 
-        if (! $customer->active) {
-            $this->disableCustomer($customer);
+        // Handle expiration
+        if ($customer->expired_at) {
+            $this->setExpiration($customer);
+        } else {
+            $this->removeExpiration($customer);
         }
+
+        // Legacy: remove Auth-Type reject if exists
+        $this->connection->table('radcheck')
+            ->where('username', $customer->username)
+            ->where('attribute', 'Auth-Type')
+            ->delete();
     }
 
     public function disableCustomer(Customer $customer): void
     {
-        $this->connection->table('radcheck')->updateOrInsert(
-            ['username' => $customer->username, 'attribute' => 'Auth-Type'],
-            ['op' => ':=', 'value' => 'Reject', 'updated_at' => now(), 'created_at' => now()]
+        // Set expiration to yesterday to immediately disable
+        $this->connection->table('radreply')->updateOrInsert(
+            ['username' => $customer->username, 'attribute' => 'Expiration'],
+            ['op' => ':=', 'value' => now()->subDay()->format('d M Y'), 'updated_at' => now(), 'created_at' => now()]
         );
     }
 
     public function enableCustomer(Customer $customer): void
     {
-        $this->connection->table('radcheck')
-            ->where('username', $customer->username)
-            ->where('attribute', 'Auth-Type')
-            ->delete();
+        $this->removeExpiration($customer);
     }
 
     public function deleteCustomer(Customer $customer): void
@@ -74,5 +81,25 @@ class FreeRadiusService
                 'online' => (bool) $row->online,
             ];
         })->toArray();
+    }
+
+    protected function setExpiration(Customer $customer): void
+    {
+        if (! $customer->expired_at) {
+            return;
+        }
+
+        $this->connection->table('radreply')->updateOrInsert(
+            ['username' => $customer->username, 'attribute' => 'Expiration'],
+            ['op' => ':=', 'value' => $customer->expired_at->format('d M Y'), 'updated_at' => now(), 'created_at' => now()]
+        );
+    }
+
+    protected function removeExpiration(Customer $customer): void
+    {
+        $this->connection->table('radreply')
+            ->where('username', $customer->username)
+            ->where('attribute', 'Expiration')
+            ->delete();
     }
 }

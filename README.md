@@ -78,7 +78,11 @@ Sistem billing ISP built with Laravel 10, Blade, Bootstrap, MySQL/MariaDB, dan i
 - Konfigurasi koneksi FreeRADIUS berada di `config/database.php` pada koneksi `radius`
 - Service sinkronisasi ada di `app/Services/FreeRadiusService.php`
 - Ketika pelanggan dibuat atau diubah, sistem otomatis memperbarui `radcheck` dan `radreply`
-- Saat pelanggan dinonaktifkan, sistem membuat atribut `Auth-Type := Reject`
+- **Status aktif/nonaktif** ditentukan oleh field `expired_at`:
+  - Jika `expired_at` kosong atau di masa depan → user aktif
+  - Jika `expired_at` sudah lewat → user expired (tidak bisa login)
+- Atribut `Expiration` di `radreply` akan di-set sesuai `expired_at` dengan format "DD MMM YYYY"
+- Saat toggle status nonaktif, `expired_at` di-set ke kemarin agar langsung expired
 
 ## Integrasi Mikrotik
 

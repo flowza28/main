@@ -19,7 +19,11 @@ class DashboardController extends Controller
     public function index()
     {
         $totalUsers = Customer::count();
-        $activeUsers = Customer::where('active', true)->count();
+        $activeUsers = Customer::where('active', true)
+            ->where(function ($query) {
+                $query->whereNull('expired_at')
+                      ->orWhere('expired_at', '>', now());
+            })->count();
         $bandwidthUsage = $this->freeRadius->getTrafficSummary();
         $totalUsage = collect($bandwidthUsage)->sum(fn ($row) => $row['download'] + $row['upload']);
         $currentMonthRevenue = Invoice::where('status', 'lunas')

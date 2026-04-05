@@ -41,4 +41,18 @@ class Customer extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function isExpired(): bool
+    {
+        return $this->expired_at && $this->expired_at->isPast();
+    }
+
+    public function getStatusAttribute(): string
+    {
+        if ($this->isExpired()) {
+            return 'expired';
+        }
+
+        return $this->attributes['status'] ?? 'active';
+    }
 }
