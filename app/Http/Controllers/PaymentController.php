@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Services\FreeRadiusService;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
+    protected FreeRadiusService $freeRadius;
+
+    public function __construct(FreeRadiusService $freeRadius)
+    {
+        $this->freeRadius = $freeRadius;
+    }
+
     public function store(Request $request, Invoice $invoice)
     {
         $data = $request->validate([
@@ -30,6 +38,16 @@ class PaymentController extends Controller
         $invoice->paid_at = $data['paid_at'];
         $invoice->save();
 
-        return redirect()->route('invoices.show', $invoice)->with('success', 'Pembayaran berhasil disimpan.');
+        $customer = $invoice->customer;
+        $customer->expired_at = $customer->expired_at && $customer->expired_at->isFuture()
+            ? $customer->expired_at->copy()->addMonth()
+            : now()->addMonth();
+        $customer->active = true;
+        $customer->status = 'active';
+        $customer->save();
+
+        $this->freeRadius->syncCustomer($customer);
+
+        return redirect()->route('invoices.show', $invoice)->with('success', 'Pembayaran berhasil disimpan dan masa aktif diperpanjang.');
     }
 }

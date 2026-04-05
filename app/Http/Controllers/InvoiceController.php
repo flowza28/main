@@ -11,6 +11,8 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
+        Invoice::generateExpiringInvoices();
+
         $status = $request->query('status');
         $invoices = Invoice::with('customer')
             ->when($status, fn ($query) => $query->where('status', $status))

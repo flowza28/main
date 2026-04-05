@@ -18,6 +18,8 @@ class DashboardController extends Controller
 
     public function index()
     {
+        Invoice::generateExpiringInvoices();
+
         $totalUsers = Customer::count();
         $activeUsers = Customer::where('active', true)
             ->where(function ($query) {
