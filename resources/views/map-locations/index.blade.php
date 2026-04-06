@@ -86,21 +86,22 @@
 @endsection
 
 @push('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-o9N1j7gY3Qzc5d3fKe9gZQws8yCkRb8ff3VV5VQvS7w=" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-    #map { min-height: 620px; }
+    #map { min-height: 620px; width: 100%; }
 </style>
 @endpush
 
 @push('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o6EFH836Y/GlTvz5LjG3W9CJxxAaW8F6f5hRk4ARm6M=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    const map = L.map('map').setView([-6.200000, 106.816666], 11);
+    document.addEventListener('DOMContentLoaded', function () {
+        const map = L.map('map').setView([-6.200000, 106.816666], 11);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
-    }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19,
+        }).addTo(map);
 
     const locationData = @json($mapMarkers);
 
@@ -135,5 +136,8 @@
     if (bounds.length) {
         map.fitBounds(bounds, { padding: [30, 30] });
     }
+
+    setTimeout(() => map.invalidateSize(), 200);
+});
 </script>
 @endpush
