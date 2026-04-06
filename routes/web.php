@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\MapLocationController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PaymentController;
@@ -18,6 +19,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'role:admin,technisi'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('customers', CustomerController::class)->except(['show']);
+    Route::resource('map-locations', MapLocationController::class)->except(['show']);
     Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
 });
 

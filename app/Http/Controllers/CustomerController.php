@@ -51,6 +51,8 @@ class CustomerController extends Controller
             'email' => 'nullable|email',
             'phone' => 'nullable|string|max:30',
             'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         $data['active'] = $request->boolean('active');
@@ -83,6 +85,8 @@ class CustomerController extends Controller
             'email' => 'nullable|email',
             'phone' => 'nullable|string|max:30',
             'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         $customer->name = $data['name'];
@@ -93,6 +97,8 @@ class CustomerController extends Controller
         $customer->email = $data['email'];
         $customer->phone = $data['phone'];
         $customer->address = $data['address'];
+        $customer->latitude = $data['latitude'];
+        $customer->longitude = $data['longitude'];
 
         if ($data['password']) {
             $customer->password = $data['password'];

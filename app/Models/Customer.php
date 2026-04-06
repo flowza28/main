@@ -21,11 +21,15 @@ class Customer extends Model
         'email',
         'phone',
         'address',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
         'expired_at' => 'date',
         'active' => 'boolean',
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
     ];
 
     public function package()

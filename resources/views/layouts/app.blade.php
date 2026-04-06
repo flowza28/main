@@ -6,6 +6,7 @@
     <title>{{ config('app.name', 'ISP Billing') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    @stack('styles')
     <style>
         .card {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -75,6 +76,11 @@
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('monitoring.*') ? 'active fw-bold' : '' }}" href="{{ route('monitoring.index') }}">
                         <i class="fas fa-chart-line me-1"></i>Monitoring
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 {{ request()->routeIs('map-locations.*') ? 'active fw-bold' : '' }}" href="{{ route('map-locations.index') }}">
+                        <i class="fas fa-map-location-dot me-1"></i>Map
                     </a>
                 </li>
             </ul>

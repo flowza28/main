@@ -55,6 +55,14 @@
                     <label class="form-label">Phone</label>
                     <input type="text" name="phone" class="form-control" value="{{ old('phone') }}">
                 </div>
+                <div class="col-md-6">
+                    <label class="form-label">Latitude</label>
+                    <input type="text" name="latitude" class="form-control" value="{{ old('latitude') }}" placeholder="-6.200000">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Longitude</label>
+                    <input type="text" name="longitude" class="form-control" value="{{ old('longitude') }}" placeholder="106.816666">
+                </div>
                 <div class="col-12">
                     <label class="form-label">Address</label>
                     <textarea name="address" class="form-control">{{ old('address') }}</textarea>
