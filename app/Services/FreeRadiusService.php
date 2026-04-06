@@ -176,6 +176,46 @@ class FreeRadiusService
     }
 
     /**
+     * Get detailed traffic for a specific user
+     */
+    public function getUserTrafficDetail(string $username): array
+    {
+        $sessions = $this->connection->table('radacct')
+            ->where('username', $username)
+            ->orderBy('acctstarttime', 'desc')
+            ->get()
+            ->map(function ($session) {
+                return [
+                    'session_id' => $session->radacctid,
+                    'start_time' => $session->acctstarttime,
+                    'stop_time' => $session->acctstoptime,
+                    'session_time' => $session->acctsessiontime,
+                    'download' => $session->acctinputoctets,
+                    'upload' => $session->acctoutputoctets,
+                    'total' => $session->acctinputoctets + $session->acctoutputoctets,
+                    'download_formatted' => $this->formatBytes($session->acctinputoctets),
+                    'upload_formatted' => $this->formatBytes($session->acctoutputoctets),
+                    'total_formatted' => $this->formatBytes($session->acctinputoctets + $session->acctoutputoctets),
+                    'nas_ip' => $session->nasipaddress,
+                    'framed_ip' => $session->framedipaddress,
+                ];
+            });
+
+        $totalDownload = $sessions->sum('download');
+        $totalUpload = $sessions->sum('upload');
+        $totalTraffic = $sessions->sum('total');
+
+        return [
+            'username' => $username,
+            'total_sessions' => $sessions->count(),
+            'total_download' => $this->formatBytes($totalDownload),
+            'total_upload' => $this->formatBytes($totalUpload),
+            'total_traffic' => $this->formatBytes($totalTraffic),
+            'sessions' => $sessions,
+        ];
+    }
+
+    /**
      * Format bytes
      */
     private function formatBytes($bytes, $precision = 2): string

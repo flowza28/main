@@ -14,19 +14,10 @@ class MonitoringController extends Controller
         $this->freeRadius = $freeRadius;
     }
 
-    public function index(Request $request)
+    public function show(Request $request, string $username)
     {
-        $search = $request->query('search');
-        $traffic = $this->freeRadius->getTrafficSummary($search);
-        $onlineUsers = collect($traffic)->where('online', true)->count();
-        $offlineUsers = collect($traffic)->where('online', false)->count();
+        $userTraffic = $this->freeRadius->getUserTrafficDetail($username);
 
-        $chartData = [
-            'labels' => collect($traffic)->pluck('username'),
-            'download' => collect($traffic)->pluck('download'),
-            'upload' => collect($traffic)->pluck('upload'),
-        ];
-
-        return view('monitoring.index', compact('traffic', 'onlineUsers', 'offlineUsers', 'chartData', 'search'));
+        return view('monitoring.show', compact('userTraffic'));
     }
 }

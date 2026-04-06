@@ -109,6 +109,7 @@
                                     <th class="border-0">Download</th>
                                     <th class="border-0">Upload</th>
                                     <th class="border-0">Status</th>
+                                    <th class="border-0 text-end">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -143,17 +144,19 @@
                                                 </span>
                                             @endif
                                         </td>
+                                        <td class="text-end">
+                                            <a href="{{ route('monitoring.show', $row['username']) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>Detail
+                                            </a>
+                                        </td>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            No user traffic data available.
+                                        </td>
+                                    </tr>
+                                @endforelse
 
 @push('scripts')
 <script>

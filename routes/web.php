@@ -21,6 +21,7 @@ Route::middleware(['auth', 'role:admin,technisi'])->group(function () {
     Route::resource('customers', CustomerController::class)->except(['show']);
     Route::resource('map-locations', MapLocationController::class)->except(['show']);
     Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
+    Route::get('monitoring/{username}', [MonitoringController::class, 'show'])->name('monitoring.show');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
