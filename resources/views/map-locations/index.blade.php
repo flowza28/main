@@ -62,9 +62,15 @@
                     <p class="text-muted">Lokasi pelanggan ditampilkan kalau sudah diisi latitude/longitude di halaman Customer.</p>
                     <ul class="list-group list-group-flush">
                         @forelse($customers as $customer)
+                            @php
+                                $isOnline = $onlineStatuses->get($customer->username, false);
+                            @endphp
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <span>{{ $customer->name }}</span>
-                                <span class="badge bg-primary">Client</span>
+                                <div>
+                                    <span class="badge bg-primary me-1">Client</span>
+                                    <span class="badge {{ $isOnline ? 'bg-success' : 'bg-danger' }}">{{ $isOnline ? 'Online' : 'Offline' }}</span>
+                                </div>
                             </li>
                         @empty
                             <li class="list-group-item text-center text-muted">Belum ada rumah client dengan koordinat.</li>
@@ -87,8 +93,13 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 <style>
     #map { min-height: 620px; width: 100%; }
+    .custom-marker {
+        background: none;
+        border: none;
+    }
 </style>
 @endpush
 
@@ -107,25 +118,39 @@
 
     const customerData = @json($customerMarkers);
 
-    function markerOptions(type, online = null) {
+    function getIcon(type, online = null) {
+        let iconClass = '';
+        let color = '';
         switch (type) {
-            case 'odp': return { color: '#ff7f00', fillColor: '#ff7f00', radius: 9 };
-            case 'server': return { color: '#d00000', fillColor: '#d00000', radius: 9 };
+            case 'odp':
+                iconClass = 'fas fa-square';
+                color = '#ff7f00';
+                break;
+            case 'server':
+                iconClass = 'fas fa-cloud';
+                color = '#d00000';
+                break;
             case 'client':
-                if (online) {
-                    return { color: '#198754', fillColor: '#198754', radius: 9 }; // green for online
-                } else {
-                    return { color: '#dc3545', fillColor: '#dc3545', radius: 9 }; // red for offline
-                }
-            default: return { color: '#0d6efd', fillColor: '#0d6efd', radius: 9 };
+                iconClass = 'fas fa-home';
+                color = online ? '#198754' : '#dc3545';
+                break;
+            default:
+                iconClass = 'fas fa-map-marker-alt';
+                color = '#0d6efd';
         }
+        return L.divIcon({
+            html: `<i class="${iconClass}" style="color: ${color}; font-size: 20px;"></i>`,
+            className: 'custom-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+        });
     }
 
     let bounds = [];
 
     locationData.forEach(point => {
         if (point.latitude && point.longitude) {
-            const marker = L.circleMarker([point.latitude, point.longitude], markerOptions(point.type)).addTo(map);
+            const marker = L.marker([point.latitude, point.longitude], { icon: getIcon(point.type) }).addTo(map);
             marker.bindPopup(`<strong>${point.name}</strong><br>${point.type_label}<br>${point.address ?? ''}`);
             bounds.push([point.latitude, point.longitude]);
         }
@@ -133,7 +158,7 @@
 
     customerData.forEach(point => {
         if (point.latitude && point.longitude) {
-            const marker = L.circleMarker([point.latitude, point.longitude], markerOptions('client', point.online)).addTo(map);
+            const marker = L.marker([point.latitude, point.longitude], { icon: getIcon('client', point.online) }).addTo(map);
             const statusText = point.online ? 'Online' : 'Offline';
             marker.bindPopup(`<strong>${point.name}</strong><br>Client House<br>${point.username}<br><span style="color: ${point.online ? 'green' : 'red'};">${statusText}</span>`);
             bounds.push([point.latitude, point.longitude]);

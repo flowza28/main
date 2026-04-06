@@ -48,7 +48,7 @@ class MapLocationController extends Controller
             ];
         })->toArray();
 
-        return view('map-locations.index', compact('mapLocations', 'customers', 'mapMarkers', 'customerMarkers'));
+        return view('map-locations.index', compact('mapLocations', 'customers', 'mapMarkers', 'customerMarkers', 'onlineStatuses'));
     }
 
     public function create()
