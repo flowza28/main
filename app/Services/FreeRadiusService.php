@@ -122,27 +122,43 @@ class FreeRadiusService
      */
     public function getTrafficSummary(?string $search = null): array
     {
-        $query = $this->connection->table('radacct')
-            ->selectRaw('
-                username,
-                SUM(acctinputoctets) as total_download,
-                SUM(acctoutputoctets) as total_upload,
-                MAX(CASE WHEN acctstoptime IS NULL THEN 1 ELSE 0 END) as online
-            ')
-            ->groupBy('username');
-
+        // Get all customers
+        $customers = \App\Models\Customer::query();
         if ($search) {
-            $query->where('username', 'like', "%{$search}%");
+            $customers->where('username', 'like', "%{$search}%");
+        }
+        $customers = $customers->pluck('username')->toArray();
+
+        if (empty($customers)) {
+            return [];
         }
 
-        return $query->get()->map(function ($row) {
-            return [
-                'username' => $row->username,
-                'download' => $this->formatBytes($row->total_download),
-                'upload' => $this->formatBytes($row->total_upload),
-                'online' => (bool) $row->online,
+        // Get traffic data with left join
+        $traffic = $this->connection->table('radacct')
+            ->selectRaw('
+                radacct.username,
+                COALESCE(SUM(radacct.acctinputoctets), 0) as total_download,
+                COALESCE(SUM(radacct.acctoutputoctets), 0) as total_upload,
+                MAX(CASE WHEN radacct.acctstoptime IS NULL THEN 1 ELSE 0 END) as online
+            ')
+            ->whereIn('radacct.username', $customers)
+            ->groupBy('radacct.username')
+            ->get()
+            ->keyBy('username');
+
+        // Combine with all customers
+        $result = [];
+        foreach ($customers as $username) {
+            $data = $traffic->get($username);
+            $result[] = [
+                'username' => $username,
+                'download' => $data ? $this->formatBytes($data->total_download) : '0 B',
+                'upload' => $data ? $this->formatBytes($data->total_upload) : '0 B',
+                'online' => $data ? (bool) $data->online : false,
             ];
-        })->toArray();
+        }
+
+        return $result;
     }
 
     /**
