@@ -120,7 +120,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($traffic as $row)
+                                @forelse($traffic as $row)
                                     <tr>
                                         <td class="ps-4">
                                             <div class="d-flex align-items-center">
