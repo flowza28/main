@@ -14,7 +14,6 @@ class Customer extends Model
         'username',
         'password',
         'package_id',
-        'pool_group_id',
         'expired_at',
         'active',
         'status',
@@ -23,6 +22,7 @@ class Customer extends Model
         'address',
         'latitude',
         'longitude',
+        'ip_address',
     ];
 
     protected $casts = [
@@ -35,11 +35,6 @@ class Customer extends Model
     public function package()
     {
         return $this->belongsTo(Package::class);
-    }
-
-    public function poolGroup()
-    {
-        return $this->belongsTo(PoolGroup::class);
     }
 
     public function invoices()

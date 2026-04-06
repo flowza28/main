@@ -45,24 +45,37 @@ class FreeRadiusService
             ]
         );
 
-        // Pool group assignment - untuk IP address dari pool
-        if ($customer->poolGroup) {
+        // IP Address assignment
+        if ($customer->ip_address) {
             $this->connection->table('radreply')->updateOrInsert(
                 [
                     'username' => $customer->username,
-                    'attribute' => 'Framed-Pool'
+                    'attribute' => 'Framed-IP-Address'
                 ],
                 [
                     'op' => ':=',
-                    'value' => $customer->poolGroup->name,
+                    'value' => $customer->ip_address,
                 ]
             );
         } else {
             $this->connection->table('radreply')
                 ->where('username', $customer->username)
-                ->where('attribute', 'Framed-Pool')
+                ->where('attribute', 'Framed-IP-Address')
                 ->delete();
         }
+
+        // Handle expiration
+        if ($customer->expired_at) {
+            $this->setExpiration($customer);
+        } else {
+            $this->removeExpiration($customer);
+        }
+
+        // Pastikan user tidak di-block Auth-Type
+        $this->connection->table('radcheck')
+            ->where('username', $customer->username)
+            ->where('attribute', 'Auth-Type')
+            ->delete();
     }
 
     /**

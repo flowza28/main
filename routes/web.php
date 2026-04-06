@@ -8,7 +8,6 @@ use App\Http\Controllers\MapLocationController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\PoolGroupController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('login'));
@@ -26,7 +25,6 @@ Route::middleware(['auth', 'role:admin,technisi'])->group(function () {
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('packages', PackageController::class)->except(['show']);
-    Route::resource('pool-groups', PoolGroupController::class)->except(['show']);
     Route::get('invoices/generate', [InvoiceController::class, 'generateMonthly'])->name('invoices.generate');
     Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');

@@ -33,9 +33,8 @@ class CustomerController extends Controller
     public function create()
     {
         $packages = Package::all();
-        $poolGroups = PoolGroup::all();
 
-        return view('customers.create', compact('packages', 'poolGroups'));
+        return view('customers.create', compact('packages'));
     }
 
     public function store(Request $request)
@@ -45,7 +44,6 @@ class CustomerController extends Controller
             'username' => 'required|string|max:100|unique:customers,username',
             'password' => 'required|string|min:6',
             'package_id' => 'required|exists:packages,id',
-            'pool_group_id' => 'nullable|exists:pool_groups,id',
             'expired_at' => 'nullable|date',
             'active' => 'boolean',
             'email' => 'nullable|email',
@@ -53,6 +51,7 @@ class CustomerController extends Controller
             'address' => 'nullable|string',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
+            'ip_address' => 'required|ip',
         ]);
 
         $data['active'] = $request->boolean('active');
@@ -67,9 +66,8 @@ class CustomerController extends Controller
     public function edit(Customer $customer)
     {
         $packages = Package::all();
-        $poolGroups = PoolGroup::all();
 
-        return view('customers.edit', compact('customer', 'packages', 'poolGroups'));
+        return view('customers.edit', compact('customer', 'packages'));
     }
 
     public function update(Request $request, Customer $customer)
@@ -79,7 +77,6 @@ class CustomerController extends Controller
             'username' => 'required|string|max:100|unique:customers,username,' . $customer->id,
             'password' => 'nullable|string|min:6',
             'package_id' => 'required|exists:packages,id',
-            'pool_group_id' => 'nullable|exists:pool_groups,id',
             'expired_at' => 'nullable|date',
             'active' => 'boolean',
             'email' => 'nullable|email',
@@ -87,12 +84,13 @@ class CustomerController extends Controller
             'address' => 'nullable|string',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
+            'ip_address' => 'required|ip',
         ]);
 
         $customer->name = $data['name'];
         $customer->username = $data['username'];
         $customer->package_id = $data['package_id'];
-        $customer->pool_group_id = $data['pool_group_id'] ?? null;
+        $customer->ip_address = $data['ip_address'];
         $customer->expired_at = $data['expired_at'];
         $customer->email = $data['email'];
         $customer->phone = $data['phone'];

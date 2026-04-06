@@ -29,15 +29,6 @@
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Pool Group</label>
-                    <select name="pool_group_id" class="form-select">
-                        <option value="">Pilih pool group (opsional)</option>
-                        @foreach($poolGroups as $poolGroup)
-                            <option value="{{ $poolGroup->id }}" {{ $customer->pool_group_id === $poolGroup->id ? 'selected' : '' }}>{{ $poolGroup->name }} ({{ $poolGroup->start_ip }} - {{ $poolGroup->end_ip }})</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-6">
                     <label class="form-label">Expired Date</label>
                     <input type="date" name="expired_at" class="form-control" value="{{ old('expired_at', optional($customer->expired_at)->format('Y-m-d')) }}">
                 </div>
@@ -55,6 +46,10 @@
                 <div class="col-md-6">
                     <label class="form-label">Phone</label>
                     <input type="text" name="phone" class="form-control" value="{{ old('phone', $customer->phone) }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">IP Address</label>
+                    <input type="text" name="ip_address" class="form-control" value="{{ old('ip_address', $customer->ip_address) }}" placeholder="192.168.1.1" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Latitude</label>
