@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('customers', function (Blueprint $table) {
             $table->string('ip_address')->nullable()->after('address');
-            $table->dropForeignKeyIfExists('customers_pool_group_id_foreign');
+            $table->dropForeign(['pool_group_id']);
             $table->dropColumn('pool_group_id');
         });
     }
