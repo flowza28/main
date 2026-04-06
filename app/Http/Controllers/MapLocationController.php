@@ -13,7 +13,29 @@ class MapLocationController extends Controller
         $mapLocations = MapLocation::orderBy('type')->get();
         $customers = Customer::whereNotNull('latitude')->whereNotNull('longitude')->get();
 
-        return view('map-locations.index', compact('mapLocations', 'customers'));
+        $mapMarkers = $mapLocations->map(function ($location) {
+            return [
+                'type' => $location->type,
+                'name' => $location->name,
+                'address' => $location->address,
+                'latitude' => $location->latitude,
+                'longitude' => $location->longitude,
+                'type_label' => $location->type_label,
+                'active' => $location->active,
+            ];
+        })->toArray();
+
+        $customerMarkers = $customers->map(function ($customer) {
+            return [
+                'name' => $customer->name,
+                'username' => $customer->username,
+                'latitude' => $customer->latitude,
+                'longitude' => $customer->longitude,
+                'type' => 'client',
+            ];
+        })->toArray();
+
+        return view('map-locations.index', compact('mapLocations', 'customers', 'mapMarkers', 'customerMarkers'));
     }
 
     public function create()

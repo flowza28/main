@@ -102,27 +102,9 @@
         maxZoom: 19,
     }).addTo(map);
 
-    const locationData = @json($mapLocations->map(function ($location) {
-        return [
-            'type' => $location->type,
-            'name' => $location->name,
-            'address' => $location->address,
-            'latitude' => $location->latitude,
-            'longitude' => $location->longitude,
-            'type_label' => $location->type_label,
-            'active' => $location->active,
-        ];
-    }));
+    const locationData = @json($mapMarkers);
 
-    const customerData = @json($customers->map(function ($customer) {
-        return [
-            'name' => $customer->name,
-            'username' => $customer->username,
-            'latitude' => $customer->latitude,
-            'longitude' => $customer->longitude,
-            'type' => 'client',
-        ];
-    }));
+    const customerData = @json($customerMarkers);
 
     function markerOptions(type) {
         switch (type) {
