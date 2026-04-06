@@ -45,19 +45,12 @@ class FreeRadiusService
             ]
         );
 
-        // Handle expiration
-        if ($customer->expired_at) {
-            $this->setExpiration($customer);
-        } else {
-            $this->removeExpiration($customer);
-        }
-
-        // Pool group assignment
+        // Pool group assignment - untuk IP address dari pool
         if ($customer->poolGroup) {
             $this->connection->table('radreply')->updateOrInsert(
                 [
                     'username' => $customer->username,
-                    'attribute' => 'Mikrotik-Group',
+                    'attribute' => 'Framed-Pool'
                 ],
                 [
                     'op' => ':=',
@@ -67,15 +60,9 @@ class FreeRadiusService
         } else {
             $this->connection->table('radreply')
                 ->where('username', $customer->username)
-                ->where('attribute', 'Mikrotik-Group')
+                ->where('attribute', 'Framed-Pool')
                 ->delete();
         }
-
-        // Pastikan user tidak di-block Auth-Type
-        $this->connection->table('radcheck')
-            ->where('username', $customer->username)
-            ->where('attribute', 'Auth-Type')
-            ->delete();
     }
 
     /**
