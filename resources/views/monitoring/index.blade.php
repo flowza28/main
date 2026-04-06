@@ -22,6 +22,13 @@
         </div>
     </div>
 
+    @if(isset($error))
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ $error }}
+        </div>
+    @endif
+
     <!-- Statistics Cards -->
     <div class="row g-3 mb-4">
         <div class="col-xl-4 col-lg-6">
