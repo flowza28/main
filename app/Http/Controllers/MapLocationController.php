@@ -4,14 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\MapLocation;
+use App\Services\FreeRadiusService;
 use Illuminate\Http\Request;
 
 class MapLocationController extends Controller
 {
+    protected FreeRadiusService $freeRadius;
+
+    public function __construct(FreeRadiusService $freeRadius)
+    {
+        $this->freeRadius = $freeRadius;
+    }
+
     public function index()
     {
         $mapLocations = MapLocation::orderBy('type')->get();
         $customers = Customer::whereNotNull('latitude')->whereNotNull('longitude')->get();
+
+        // Get online status for customers
+        $traffic = $this->freeRadius->getTrafficSummary();
+        $onlineStatuses = collect($traffic)->pluck('online', 'username');
 
         $mapMarkers = $mapLocations->map(function ($location) {
             return [
@@ -25,13 +37,14 @@ class MapLocationController extends Controller
             ];
         })->toArray();
 
-        $customerMarkers = $customers->map(function ($customer) {
+        $customerMarkers = $customers->map(function ($customer) use ($onlineStatuses) {
             return [
                 'name' => $customer->name,
                 'username' => $customer->username,
                 'latitude' => $customer->latitude,
                 'longitude' => $customer->longitude,
                 'type' => 'client',
+                'online' => $onlineStatuses->get($customer->username, false),
             ];
         })->toArray();
 

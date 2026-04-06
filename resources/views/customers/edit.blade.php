@@ -58,11 +58,11 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Latitude</label>
-                    <input type="text" name="latitude" class="form-control" value="{{ old('latitude', $customer->latitude) }}" placeholder="-6.200000">
+                    <input type="text" name="latitude" class="form-control" value="{{ old('latitude', $customer->latitude) }}" placeholder="-6.200000" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Longitude</label>
-                    <input type="text" name="longitude" class="form-control" value="{{ old('longitude', $customer->longitude) }}" placeholder="106.816666">
+                    <input type="text" name="longitude" class="form-control" value="{{ old('longitude', $customer->longitude) }}" placeholder="106.816666" required>
                 </div>
                 <div class="col-12">
                     <label class="form-label">Address</label>

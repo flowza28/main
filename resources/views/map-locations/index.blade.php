@@ -107,10 +107,16 @@
 
     const customerData = @json($customerMarkers);
 
-    function markerOptions(type) {
+    function markerOptions(type, online = null) {
         switch (type) {
             case 'odp': return { color: '#ff7f00', fillColor: '#ff7f00', radius: 9 };
             case 'server': return { color: '#d00000', fillColor: '#d00000', radius: 9 };
+            case 'client':
+                if (online) {
+                    return { color: '#198754', fillColor: '#198754', radius: 9 }; // green for online
+                } else {
+                    return { color: '#dc3545', fillColor: '#dc3545', radius: 9 }; // red for offline
+                }
             default: return { color: '#0d6efd', fillColor: '#0d6efd', radius: 9 };
         }
     }
@@ -127,8 +133,9 @@
 
     customerData.forEach(point => {
         if (point.latitude && point.longitude) {
-            const marker = L.circleMarker([point.latitude, point.longitude], markerOptions('client')).addTo(map);
-            marker.bindPopup(`<strong>${point.name}</strong><br>Client House<br>${point.username}`);
+            const marker = L.circleMarker([point.latitude, point.longitude], markerOptions('client', point.online)).addTo(map);
+            const statusText = point.online ? 'Online' : 'Offline';
+            marker.bindPopup(`<strong>${point.name}</strong><br>Client House<br>${point.username}<br><span style="color: ${point.online ? 'green' : 'red'};">${statusText}</span>`);
             bounds.push([point.latitude, point.longitude]);
         }
     });
