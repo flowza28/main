@@ -131,12 +131,12 @@
                                         </td>
                                         <td>
                                             <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
-                                                {{ format_bytes($row['download']) }}
+                                                {{ $row['download'] }}
                                             </span>
                                         </td>
                                         <td>
                                             <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
-                                                {{ format_bytes($row['upload']) }}
+                                                {{ $row['upload'] }}
                                             </span>
                                         </td>
                                         <td>
