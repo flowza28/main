@@ -27,7 +27,7 @@ class DashboardController extends Controller
                       ->orWhere('expired_at', '>', now());
             })->count();
         $bandwidthUsage = $this->freeRadius->getTrafficSummary();
-        $totalUsage = collect($bandwidthUsage)->sum(fn ($row) => $row['download'] + $row['upload']);
+        $totalUsage = collect($bandwidthUsage)->sum(fn ($row) => $row['download_bytes'] + $row['upload_bytes']);
         $currentMonthRevenue = Invoice::where('status', 'lunas')
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)

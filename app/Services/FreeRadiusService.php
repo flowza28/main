@@ -154,6 +154,8 @@ class FreeRadiusService
                 'username' => $username,
                 'download' => $data ? $this->formatBytes($data->total_download) : '0 B',
                 'upload' => $data ? $this->formatBytes($data->total_upload) : '0 B',
+                'download_bytes' => $data ? (int) $data->total_download : 0,
+                'upload_bytes' => $data ? (int) $data->total_upload : 0,
                 'online' => $data ? (bool) $data->online : false,
             ];
         }
@@ -203,8 +205,8 @@ class FreeRadiusService
             ->map(function ($session) {
                 return [
                     'session_id' => $session->radacctid,
-                    'start_time' => $session->acctstarttime,
-                    'stop_time' => $session->acctstoptime,
+                    'start_time' => $session->acctstarttime ? \Carbon\Carbon::parse($session->acctstarttime) : null,
+                    'stop_time' => $session->acctstoptime ? \Carbon\Carbon::parse($session->acctstoptime) : null,
                     'session_time' => $session->acctsessiontime,
                     'download' => $session->acctinputoctets,
                     'upload' => $session->acctoutputoctets,
