@@ -83,4 +83,91 @@ class MikrotikService
 
         return $users;
     }
+
+    /**
+     * Get interface traffic data
+     */
+    public function getInterfaceTraffic(string $host, string $username, string $password, string $interface = 'ether1'): array
+    {
+        try {
+            $ssh = new SSH2($host);
+            if (!$ssh->login($username, $password)) {
+                return [];
+            }
+
+            // Monitor traffic for specific interface
+            $command = "/interface monitor-traffic $interface once";
+            $output = $ssh->exec($command);
+
+            // Parse output
+            $lines = explode("\n", trim($output));
+            $data = [];
+
+            foreach ($lines as $line) {
+                if (strpos($line, 'rx-bits-per-second:') !== false) {
+                    $data['rx_bits_per_second'] = (int) trim(str_replace('rx-bits-per-second:', '', $line));
+                }
+                if (strpos($line, 'tx-bits-per-second:') !== false) {
+                    $data['tx_bits_per_second'] = (int) trim(str_replace('tx-bits-per-second:', '', $line));
+                }
+                if (strpos($line, 'rx-bytes:') !== false) {
+                    $data['rx_bytes'] = (int) trim(str_replace('rx-bytes:', '', $line));
+                }
+                if (strpos($line, 'tx-bytes:') !== false) {
+                    $data['tx_bytes'] = (int) trim(str_replace('tx-bytes:', '', $line));
+                }
+            }
+
+            return $data;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get all interfaces traffic
+     */
+    public function getAllInterfacesTraffic(string $host, string $username, string $password): array
+    {
+        try {
+            $ssh = new SSH2($host);
+            if (!$ssh->login($username, $password)) {
+                return [];
+            }
+
+            // Get all ethernet interfaces
+            $command = "/interface ethernet print";
+            $output = $ssh->exec($command);
+            $interfaces = $this->parseEthernetInterfaces($output);
+
+            $trafficData = [];
+            foreach ($interfaces as $interface) {
+                $traffic = $this->getInterfaceTraffic($host, $username, $password, $interface);
+                if (!empty($traffic)) {
+                    $trafficData[$interface] = $traffic;
+                }
+            }
+
+            return $trafficData;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    private function parseEthernetInterfaces(string $output): array
+    {
+        $lines = explode("\n", trim($output));
+        $interfaces = [];
+
+        foreach ($lines as $line) {
+            if (empty($line) || strpos($line, 'Flags:') === 0 || strpos($line, '#') === 0) continue;
+
+            $parts = preg_split('/\s+/', $line, -1, PREG_SPLIT_NO_EMPTY);
+            if (count($parts) >= 2) {
+                $interfaces[] = $parts[1]; // name column
+            }
+        }
+
+        return $interfaces;
+    }
 }

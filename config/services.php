@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'mikrotik' => [
+        'host' => env('MIKROTIK_HOST', '192.168.1.1'),
+        'username' => env('MIKROTIK_USER', 'admin'),
+        'password' => env('MIKROTIK_PASSWORD'),
+    ],
+
 ];

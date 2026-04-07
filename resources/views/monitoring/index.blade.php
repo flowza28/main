@@ -84,7 +84,7 @@
                 <div class="card-header bg-white border-0 py-3">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-wave-square text-primary me-2"></i>
-                        Traffic Overview
+                        Interface Traffic Overview
                     </h5>
                 </div>
                 <div class="card-body">
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels: @json($chartData['labels']),
                 datasets: [
                     {
-                        label: 'Download',
+                        label: 'RX (Receive)',
                         backgroundColor: 'rgba(13, 110, 253, 0.1)',
                         borderColor: '#0d6efd',
                         borderWidth: 2,
@@ -186,10 +186,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6,
-                        data: @json($chartData['download'])
+                        data: @json($chartData['rx_bytes'])
                     },
                     {
-                        label: 'Upload',
+                        label: 'TX (Transmit)',
                         backgroundColor: 'rgba(25, 135, 84, 0.1)',
                         borderColor: '#198754',
                         borderWidth: 2,
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6,
-                        data: @json($chartData['upload'])
+                        data: @json($chartData['tx_bytes'])
                     }
                 ]
             },
